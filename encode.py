@@ -3,7 +3,6 @@ import face_recognition
 import pickle
 import os
 
-
 # importing the images
 folderPath = 'image'
 folderPathList = os.listdir(folderPath)

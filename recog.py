@@ -56,8 +56,11 @@ while True:
     # find all the faces and face encodings in current frame of video
     facesCurFrame = face_recognition.face_locations(rgb_imgS)
 
-    if not facesCurFrame: # if there are no faces restart the timer
+
+    # TODO if there are no faces and 3 seconds elapsed reset
+    if not facesCurFrame: # if there are no faces restart the timer 
         timer = 0
+        msgText = 'Welcome'
 
     for (top, right, bottom, left) in facesCurFrame:
         top *= 4
@@ -66,9 +69,12 @@ while True:
         left *= 4
         b,g,r = 0,255,0
         
-        timer +=1
+        timer += 1 # BUG WHEN ONLY 1's reset DONT KNOW WHATS CAUSING IT YET.
+        # TODO MAKE USE OF FUNCTIONS
         print(timer)
         if timer == 20:
+            cv2.putText(img, 'LOADING', (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 1)
+            cv2.waitKey(1)
             msgText = faceRecog(facesCurFrame)
             
         cv2.rectangle(img, (left, top), (right, bottom), (b,g,r), 2)
