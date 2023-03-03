@@ -12,10 +12,14 @@ for cl in myList:
     stdNames.append(os.path.splitext(cl)[0])
 print(stdNames)
 
-file = open('EncodeFile.p', 'rb')
-encodeListKnownWithIds = pickle.load(file)
-file.close()
+with open('EncodeFile.p', 'rb') as file:
+    encodeListKnownWithIds = pickle.load(file)
 encodeStdKnown, studentIds = encodeListKnownWithIds
+
+# file = open('EncodeFile.p', 'rb')
+# encodeListKnownWithIds = pickle.load(file)
+# file.close()
+# encodeStdKnown, studentIds = encodeListKnownWithIds
 
 print('Encoding Complete')
 
