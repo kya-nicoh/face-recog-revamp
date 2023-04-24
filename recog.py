@@ -16,21 +16,9 @@ with open('EncodeFile.p', 'rb') as file:
     encodeListKnownWithIds = pickle.load(file)
 encodeStdKnown, studentIds = encodeListKnownWithIds
 
-# file = open('EncodeFile.p', 'rb')
-# encodeListKnownWithIds = pickle.load(file)
-# file.close()
-# encodeStdKnown, studentIds = encodeListKnownWithIds
-
 print('Encoding Complete')
 
-# facial recognition
-current_frame = True
-vid = cv2.VideoCapture(0)
-
-if not vid.isOpened():
-    print('ERROR! No video source found...')
-
-def faceRecog(facesCurFrame):
+def faceRecog(rgb_imgS, facesCurFrame):
     encodesCurFrame = face_recognition.face_encodings(rgb_imgS, facesCurFrame)
     detected_faces = []
     for encodeFace in encodesCurFrame:
@@ -47,48 +35,57 @@ def faceRecog(facesCurFrame):
             name = stdNames[isMatch]
 
         return name
+    
 
-timer = 0
-msgText = 'Welcome'
-while True:
-    ret, img = vid.read()
+def main_recog():
+    current_frame = True
+    vid = cv2.VideoCapture(0)
 
-    # if current_frame:
-    imgS = cv2.resize(img, (0, 0), fx= 0.25, fy=0.25)
-    rgb_imgS = imgS[:, :, ::-1]
+    if not vid.isOpened():
+        print('ERROR! No video source found...')
 
-    # find all the faces and face encodings in current frame of video
-    facesCurFrame = face_recognition.face_locations(rgb_imgS)
+    timer = 0
+    msgText = 'Welcome'
+    while True:
+        ret, img = vid.read()
 
+        # if current_frame:
+        imgS = cv2.resize(img, (0, 0), fx= 0.25, fy=0.25)
+        rgb_imgS = imgS[:, :, ::-1]
 
-    # TODO if there are no faces and 3 seconds elapsed reset
-    if not facesCurFrame: # if there are no faces restart the timer 
-        timer = 0
-        msgText = 'Welcome'
+        # find all the faces and face encodings in current frame of video
+        facesCurFrame = face_recognition.face_locations(rgb_imgS)
 
-    for (top, right, bottom, left) in facesCurFrame:
-        top *= 4
-        right *= 4
-        bottom *= 4
-        left *= 4
-        b,g,r = 0,255,0
-        
-        timer += 1 # BUG WHEN ONLY 1's reset DONT KNOW WHATS CAUSING IT YET.
-        # TODO MAKE USE OF FUNCTIONS
-        print(timer)
-        if timer == 20:
-            cv2.putText(img, 'LOADING', (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 1)
-            cv2.waitKey(1)
-            msgText = faceRecog(facesCurFrame)
+        # TODO if there are no faces and 3 seconds elapsed reset
+        if not facesCurFrame: # if there are no faces restart the timer 
+            timer = 0
+            msgText = 'Welcome'
+
+        for (top, right, bottom, left) in facesCurFrame:
+            top *= 4
+            right *= 4
+            bottom *= 4
+            left *= 4
+            b,g,r = 0,255,0
             
-        cv2.rectangle(img, (left, top), (right, bottom), (b,g,r), 2)
-        cv2.rectangle(img, (left, bottom - 35), (right, bottom), (b,g,r), cv2.FILLED)
-        cv2.putText(img, msgText, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 1)
+            timer += 1 # BUG WHEN ONLY 1's reset DONT KNOW WHATS CAUSING IT YET.
+            # TODO MAKE USE OF FUNCTIONS
+            print(timer)
+            if timer == 20:
+                cv2.putText(img, 'LOADING', (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 1)
+                cv2.waitKey(1)
+                msgText = faceRecog(rgb_imgS, facesCurFrame)
+                
+            cv2.rectangle(img, (left, top), (right, bottom), (b,g,r), 2)
+            cv2.rectangle(img, (left, bottom - 35), (right, bottom), (b,g,r), cv2.FILLED)
+            cv2.putText(img, msgText, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 1)
 
-    # current_frame = not current_frame
+        # current_frame = not current_frame
 
-    cv2.imshow('Webcam', img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):  
-        vid.release()
-        cv2.destroyAllWindows()          
-        break
+        cv2.imshow('Webcam', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):  
+            vid.release()
+            cv2.destroyAllWindows()          
+            break
+
+main_recog()
